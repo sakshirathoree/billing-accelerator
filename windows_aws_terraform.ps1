@@ -1,6 +1,7 @@
 # Check if AWS CLI is installed
-$awsCliVersion = & aws --version 2>&1
-if ($LASTEXITCODE -eq 0) {
+$awsCommand = Get-Command aws -ErrorAction SilentlyContinue
+if ($awsCommand) {
+    $awsCliVersion = & aws --version 2>&1
     Write-Host "AWS CLI is already installed. Version: $awsCliVersion"
 }
 else {

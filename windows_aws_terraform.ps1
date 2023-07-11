@@ -27,15 +27,20 @@ else {
 }
 
 # Check if Terraform is installed
-$terraformVersion = & terraform --version 2>&1
-if ($LASTEXITCODE -eq 0) {
+$terraformVersion = Get-Command terraform -ErrorAction SilentlyContinue
+if ($terraformVersion) {
+    $terraformVersion = & terraform --version 2>&1
     Write-Host "Terraform is already installed. Version: $terraformVersion"
 }
 else {
     # Install Terraform
+    $terraformZipPath = Join-Path $env:TEMP "terraform.zip"
+    $terraformDestination = Join-Path $env:USERPROFILE "terraform"
+
     Write-Host "Installing Terraform..."
-    Invoke-WebRequest "https://releases.hashicorp.com/terraform/0.15.4/terraform_0.15.4_windows_amd64.zip" -OutFile "terraform.zip"
-    Expand-Archive -Path "terraform.zip" -DestinationPath $env:TEMP
-    Move-Item -Path "$env:TEMP\terraform.exe" -Destination "C:\Users\rajlaxmi.rathore\Downloads\billing-lambda-tf"
-    Remove-Item "terraform.zip"
+    Invoke-WebRequest "https://releases.hashicorp.com/terraform/0.15.4/terraform_0.15.4_windows_amd64.zip" -OutFile $terraformZipPath
+    Expand-Archive -Path $terraformZipPath -DestinationPath $env:TEMP
+    Move-Item -Path (Join-Path $env:TEMP "terraform.exe") -Destination $terraformDestination
+    Remove-Item $terraformZipPath
 }
+
